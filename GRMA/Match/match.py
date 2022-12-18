@@ -11,7 +11,7 @@ from GRMA.Grim import run_GRIMM
 from GRMA.Match import Graph as MatchingGraph
 from GRMA.Match.DonorsMatching import DonorsMatching, _init_results_df
 from GRMA.Match.GraphWrapper import Graph
-from GRMA.Utilties.utils import print_time
+from GRMA.Utilities.utils import print_time
 
 
 def find_matches(imputation_filename: Union[str, PathLike], graph: Graph,

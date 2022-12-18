@@ -4,7 +4,7 @@ import pickle
 from os import PathLike
 from typing import Union
 
-from GRMA.Utilties.geno_representation import HashableArray
+from GRMA.Utilities.geno_representation import HashableArray
 from GRMA.Match.lol_graph import LolGraph
 
 NODES_TYPES = Union[int, HashableArray]

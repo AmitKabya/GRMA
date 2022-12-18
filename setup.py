@@ -1,3 +1,4 @@
+import numpy as np
 from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 
@@ -44,10 +45,11 @@ setup(
     zip_safe=False,
     ext_modules=cythonize(
         [
-            Extension("cutils", ["GRMA.cutils.pyx"],
+            Extension("GRMA.Utilities.cutils", ["GRMA/Utilities/cutils.pyx"],
                       define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-            Extension("lol_graph", ["lol_graph.pyx"],
+            Extension("GRMA.Match.lol_graph", ["GRMA/Match/lol_graph.pyx"],
                       define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])
         ]
     ),
+    include_dirs=[np.get_include()]
 )

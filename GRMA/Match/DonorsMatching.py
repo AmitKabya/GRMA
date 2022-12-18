@@ -9,8 +9,8 @@ import pandas as pd
 from tqdm import tqdm
 
 from GRMA.Match.GraphWrapper import Graph
-from GRMA.Utilties.geno_representation import HashableArray, ClassMinusOne
-from GRMA.Utilties.utils import donor_mismatch_format, \
+from GRMA.Utilities.geno_representation import HashableArray, ClassMinusOne
+from GRMA.Utilities.utils import donor_mismatch_format, \
     drop_less_than_7_matches, check_similarity, gl_string_to_integers, tuple_geno_to_int
 
 DONORS_DB: pd.DataFrame = pd.DataFrame()

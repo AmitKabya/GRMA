@@ -6,7 +6,7 @@ import gc
 from collections import OrderedDict
 
 from GRMA.Build import Edge
-from GRMA.Utilties.utils import print_time
+from GRMA.Utilities.utils import print_time
 
 
 class LolBuilder:

@@ -9,8 +9,8 @@ from tqdm import tqdm
 from GRMA.Build import Edge
 from GRMA.Build.create_lol import LolBuilder
 from GRMA.Match.GraphWrapper import Graph
-from GRMA.Utilties.geno_representation import HashableArray
-from GRMA.Utilties.utils import gl_string_to_integers, tuple_geno_to_int, print_time
+from GRMA.Utilities.geno_representation import HashableArray
+from GRMA.Utilities.utils import gl_string_to_integers, tuple_geno_to_int, print_time
 
 CLASS_I_END = 6
 
