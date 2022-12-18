@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from GRMA.Build import Edge
 from GRMA.Build.create_lol import LolBuilder
+from GRMA.Match.GraphWrapper import Graph
 from GRMA.Utilties.geno_representation import HashableArray
 from GRMA.Utilties.utils import gl_string_to_integers, tuple_geno_to_int, print_time
 
@@ -143,6 +144,10 @@ class BuildMatchingGraph:
 
         # create graph's dict-representation of LOL
         self._graph = LolBuilder(directed=True, weighted=True, verbose=self._verbose).build(self._edges, layers)
+
+    @property
+    def graph(self):
+        return Graph(self._graph)
 
     def to_pickle(self, path: Union[str, os.PathLike]):
         """

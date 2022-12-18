@@ -12,6 +12,7 @@ NODES_TYPES = Union[int, HashableArray]
 
 class Graph(object):
     """Graph wrapper class for LOLGraph"""
+    __slots__ = "_map_node_to_number", "_graph"
 
     def __init__(self, lol_properties: dict):
         self._map_node_to_number = lol_properties["map_node_to_number"]

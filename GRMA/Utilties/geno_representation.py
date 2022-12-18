@@ -23,7 +23,10 @@ class ClassMinusOne:
 
 
 class HashableArray:
+    __slots__ = "arr", "it"
+
     def __init__(self, arr):
+        self.it = None
         self.arr = np.array(arr, dtype=np.uint16)
 
     def __hash__(self):

@@ -30,7 +30,7 @@ def find_matches(imputation_filename: Union[str, PathLike], graph: Graph,
     :param threshold: Minimal score value for a valid match. default is 0.1.
     :param cutof: Maximum number of matches to return. default is 50.
     :param verbose: A boolean flag for whether to print the documentation. default is False
-    :param save_to_csv: A boolean flag for whether to save the matching results into a csv file.
+    :param save_to_csv: A boolean flag for whether to save the matching results into a csv file. default is False.
     If one wishes to save the results to csv files, a directory named 'Matching_Results_{searchId}' will be created in
     the working directory. If a directory by this name was already created, an error will be raised.
     Note: saving a pandas into a csv might take a couple of seconds
@@ -94,7 +94,7 @@ def matching(filepath: Union[str, PathLike], grim_graph: GrimGraph, match_graph:
     :param filepath: path to patients file.
     :param grim_graph: A Graph object from grim.imputation.networkx_graph
     :param match_graph: A Graph object from GRMA.Match
-    :param save_imputation: A flag for whether to save the imputation results.
+    :param save_imputation: A flag for whether to save the imputation results. default is False.
     Accepts boolean/str/PathLike values - False will not save a file,
     True will save a file named 'imputation{searchId}.csv' in the working directory.
     str/PathLike will create and save the given file as long as the file's directory is valid.
@@ -104,7 +104,7 @@ def matching(filepath: Union[str, PathLike], grim_graph: GrimGraph, match_graph:
     :param threshold: Minimal score value for a valid match. default is 0.1.
     :param cutof: Maximum number of matches to return. default is 50.
     :param verbose: A boolean flag for whether to print the documentation. default is False
-    :param save_to_csv: A boolean flag for whether to save the matching results into a csv file.
+    :param save_to_csv: A boolean flag for whether to save the matching results into a csv file. default is False.
     If one wishes to save the results to csv files, a directory named 'Matching_Results_{searchId}' will be created in
     the working directory. If a directory by this name was already created, an error will be raised.
     Note: saving a pandas into a csv might take a couple of seconds

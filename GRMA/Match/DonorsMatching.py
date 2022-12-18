@@ -51,10 +51,11 @@ def _init_results_df(donors_info):
 
 class DonorsMatching(object):
     """DonorsMatching class is in charge of the matching process"""
+    __slots__ = "_graph", "_patients_graph", "patients"
 
     def __init__(self, graph: Graph):
-        self.graph: Graph = graph
-        self.patients_graph: nx.DiGraph = nx.DiGraph()
+        self._graph: Graph = graph
+        self._patients_graph: nx.DiGraph = nx.DiGraph()
         self.patients: dict[int, Sequence[int]] = {}
 
     # <print matching information to csv>
@@ -63,7 +64,7 @@ class DonorsMatching(object):
         Returns the mismatch format of the most common genotype of the donor."""
         don_geno = ""
         geno_max_prob = 0
-        for geno in self.graph.neighbors(don_id):
+        for geno in self._graph.neighbors(don_id):
             if geno[1] > geno_max_prob:
                 geno_max_prob = geno[1]
                 don_geno = geno[0]
@@ -76,7 +77,7 @@ class DonorsMatching(object):
 
         for i, allele in enumerate(pat_geno):
             p = 0
-            for don_geno, don_weight in self.graph.neighbors(don_id):
+            for don_geno, don_weight in self._graph.neighbors(don_id):
                 if allele in don_geno:
                     p += don_weight
             probs[i] = int(round(p * 100))
@@ -88,13 +89,13 @@ class DonorsMatching(object):
     def find_genotype_from_subclass(self, sub: int) -> np.ndarray:
         """Takes an integer subclass. \n
         Returns the genotypes which are connected to it in the graph"""
-        return self.graph.neighbors_2nd(sub)
+        return self._graph.neighbors_2nd(sub)
 
     def find_donor_from_geno(self, geno_id: int) -> Sequence[int]:
         """Get the LOL ID of a genotype. \n
         Return its neighbors - all the donors that has this genotype."""
         donors = []
-        for iid, w in self.graph.neighbors(geno_id, search_lol_id=True):
+        for iid, w in self._graph.neighbors(geno_id, search_lol_id=True):
             donors.append(iid)
         return donors
 
@@ -123,21 +124,21 @@ class DonorsMatching(object):
             candidates_to_iterate = drop_less_than_7_matches(genotypes_id_from_subclass, similarities)
             for candidate_id, similarity in candidates_to_iterate:
                 # iterate over all the patients with the genotype
-                for patient_id in self.patients_graph.neighbors(geno):
+                for patient_id in self._patients_graph.neighbors(geno):
                     # patient's geno index
-                    geno_num = self.patients_graph[geno][patient_id]["geno_num"]
+                    geno_num = self._patients_graph[geno][patient_id]["geno_num"]
                     # patient's geno probability
-                    probability = self.patients_graph[geno][patient_id]["probability"]
+                    probability = self._patients_graph[geno][patient_id]["probability"]
 
                     # add the genotype id as a neighbor to the patient
-                    if candidate_id in self.patients_graph.adj[patient_id]:
-                        self.patients_graph[patient_id][candidate_id]['weight'][geno_num] = [probability,
-                                                                                             similarity]
+                    if candidate_id in self._patients_graph.adj[patient_id]:
+                        self._patients_graph[patient_id][candidate_id]['weight'][geno_num] = [probability,
+                                                                                              similarity]
                     else:
-                        if candidate_id not in self.patients_graph:
-                            self.patients_graph.add_node(candidate_id)
-                        self.patients_graph.add_edge(patient_id, candidate_id,
-                                                     weight={geno_num: [probability, similarity]})
+                        if candidate_id not in self._patients_graph:
+                            self._patients_graph.add_node(candidate_id)
+                        self._patients_graph.add_edge(patient_id, candidate_id,
+                                                      weight={geno_num: [probability, similarity]})
 
     def add_subclasses(self, genotype: HashableArray, subclasses: list[ClassMinusOne]) -> list[ClassMinusOne]:
         """Takes a genotype, and a list of subclasses that were already processed,
@@ -165,9 +166,9 @@ class DonorsMatching(object):
                                          allele_num=missing_allele_num)
 
                 # add subclass -> genotype edge to patients graph
-                if subclass not in self.patients_graph:
+                if subclass not in self._patients_graph:
                     subclasses.append(subclass)
-                self.patients_graph.add_edge(subclass, genotype)
+                self._patients_graph.add_edge(subclass, genotype)
         return subclasses
 
     def create_patients_graph(self, f_patients: str) -> list[ClassMinusOne]:
@@ -175,7 +176,7 @@ class DonorsMatching(object):
         create patients graph. \n
         *takes in consideration that grimm outputs for each patient different genotypes*
         """
-        self.patients_graph: nx.DiGraph = nx.DiGraph()
+        self._patients_graph: nx.DiGraph = nx.DiGraph()
         prob_dict: dict = {}  # {geno: [i, prob]}
         total_prob: float = 0
         last_patient: int = -1
@@ -194,7 +195,7 @@ class DonorsMatching(object):
             if index == 0:
                 # set normalized probabilities
                 for HLA, (_, probability) in prob_dict.items():
-                    self.patients_graph.edges[HLA, last_patient]['probability'] = \
+                    self._patients_graph.edges[HLA, last_patient]['probability'] = \
                         probability / total_prob
 
                 # initialize parameters
@@ -216,13 +217,13 @@ class DonorsMatching(object):
                 prob_dict[geno][1] += prob
 
             # add genotype->ID edge
-            self.patients_graph.add_edge(geno, patient_id, probability=0, geno_num=index)
+            self._patients_graph.add_edge(geno, patient_id, probability=0, geno_num=index)
             # add subclasses alleles
             subclasses = self.add_subclasses(geno, subclasses)
 
         # set normalized probabilities to the last patient
         for g, (_, probability) in prob_dict.items():
-            self.patients_graph.edges[g, last_patient]['probability'] = \
+            self._patients_graph.edges[g, last_patient]['probability'] = \
                 probability / total_prob
 
         return subclasses
@@ -230,8 +231,8 @@ class DonorsMatching(object):
     def create_patients_graph_and_find_candidates(self, f_patients: str, verbose: bool) -> dict[int, Sequence[int]]:
         subclasses = self.create_patients_graph(f_patients)
         for subclass in tqdm(subclasses, desc="finding matching candidates", disable=not verbose):
-            if self.graph.in_nodes(subclass.subclass):
-                self.find_candidates(subclass, self.patients_graph.neighbors(subclass))
+            if self._graph.in_nodes(subclass.subclass):
+                self.find_candidates(subclass, self._patients_graph.neighbors(subclass))
         return self.patients
 
     def score_matches(self, mismatch: int, results_df: pd.DataFrame, donors_info: Iterable[str],
@@ -256,17 +257,17 @@ class DonorsMatching(object):
 
         # a loop that set the scores for all the matching candidates.
         patient_scores = {}
-        for hla_id in self.patients_graph.neighbors(patient):
-            for i in self.patients_graph.get_edge_data(patient, hla_id)['weight']:
+        for hla_id in self._patients_graph.neighbors(patient):
+            for i in self._patients_graph.get_edge_data(patient, hla_id)['weight']:
                 # match_info = (probability of patient's genotype, number of matches to patient's genotype)
-                match_info = self.patients_graph.get_edge_data(patient, hla_id)['weight'][i]
+                match_info = self._patients_graph.get_edge_data(patient, hla_id)['weight'][i]
                 if match_info[1] == 10 - mismatch:
                     prob = match_info[0]
 
                     # add the probabilities multiplication of the patient and all the donors that has this genotype
                     # to their matching probabilities.
                     for donor in self.find_donor_from_geno(hla_id):
-                        donor_prob = self.graph.get_edge_data(node1=hla_id, node2=donor, node1_id=True)
+                        donor_prob = self._graph.get_edge_data(node1=hla_id, node2=donor, node1_id=True)
                         if donor in patient_scores:
                             patient_scores[donor][0] += prob * donor_prob
                             if donor_prob > patient_scores[donor][2]:
