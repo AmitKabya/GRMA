@@ -49,7 +49,7 @@ performing the matching if additional fields are ment to be added to the results
 Get the donors' graph from saved pickle file:
 ```python
 from GRMA.Match import Graph
-graph = Graph.from_pickle("path/to/save.pkl")
+graph = Graph.from_pickle("path/to/save.pkl") 
 ```
 
 The matching result is a dictionary that maps patients IDs to a `pandas.DataFrame` of the matched donors.
