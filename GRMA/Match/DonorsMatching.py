@@ -311,7 +311,7 @@ class DonorsMatching(object):
         """add a donor to the matches dictionary"""
 
         add_donors["Patient_ID"].append(patient)
-        add_donors["Donor_ID"].append(patient)
+        add_donors["Donor_ID"].append(donor)
         allele_prob = self.probability_to_allele(don_id=donor, pat_geno=self.patients[patient])
         add_donors["Match_Probability_A_1"].append(allele_prob[0])
         add_donors["Match_Probability_A_2"].append(allele_prob[1])
