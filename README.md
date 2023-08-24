@@ -1,68 +1,67 @@
-# GRMA
-GRMA - Graph based Matching
+# GRMA - Graph-based Matching Algorithm
 
-GRMA is a package for finding HLA matches using graphs approach.
-The matching is based on [grim](https://github.com/nmdp-bioinformatics/py-graph-imputation)'s imputation.
+GRMA is a Python package for finding HLA (Human Leukocyte Antigen) matches using a graph-based approach. The matching is based on Grim's imputation.
+
+## Example Usage
+
+To use GRMA, follow these steps:
+
+1. **Build Donors Graph**: Create a Donors Graph, which represents your HLA search space object.
+
+    ```python
+    from grma.matching import BuildDonorsGraph
+    
+    donors_dir = 'data/donors_dir'  # Path to your donors data directory
+    results_directory = './results_directory'  # Directory to save results
+    
+    BuildDonorsGraph(donors_dir, results_directory)
+    ```
+
+2. **Impute Patients' Genotypes**: Impute your patient's genotypes using Grim's algorithm. You can use the default settings or customize them by providing a Grim configuration file.
+
+    ```python
+    from grma.matching import GetResultPatients
+
+    grim_config_file = 'minimal-configuration.json'  # Path to Grim configuration file
+    donors_graph_file = 'data/donors_graph.pkl'  # Path to the Donors Graph pickle file
+    result_directory = './result_dir'  # Directory to save results
+    cutoff = 100  # Maximum number of matches to return
+    threshold = 0.1  # Minimal score value for a valid match
+    
+    GetResultPatients(grim_config_file, donors_graph_file, result_directory, cutof=cutoff, threshold=threshold)
+    ```
+- grim_config_file: Example at "minimal-configuration.json" (need to add some files: freq_file, imputation_in_file). 
+- donors_graph_file: Path to the Donors Graph pickle file.
+- result_directory: Directory to save results.
+- Threshold: Minimal score value for a valid match. Default is 0.1.
+- Cutoff: Maximum number of matches to return. Default is 50.
+
 
 ## Building The Donors' Graph
 
-The donors' graph is a graph implemented using an LOL (List of Lists) representation written in cython for better
-time and memory efficiency.
+The Donors' Graph is a representation of your HLA search space. It's implemented as a List of Lists (LOL) structure for improved time and memory efficiency. It's recommended to save the graph in a pickle file.
 
-Before building the donors' graph, all the donors' HLAs must be imputed using `grim`.
-Then all the imputation files must be saved under the same directory.
+Before building the Donors' Graph, ensure that all donors' HLAs have been imputed using Grim and the imputation files are saved under the same directory.
 
-```python
-from GRMA.Build.BuildMatchingGraph import BuildMatchingGraph
+## Imputing Patients' Genotypes
 
-build_matching = BuildMatchingGraph("path/to/donors/directory")
-# get the donors' graph
-graph = build_matching.graph
-# save the donors' graph to pickle
-build_matching.to_pickle("path/to/save.pkl")
-```
-
-## Search & Match
-
-Find matches up to 3 mismatches and get a `pandas.DataFrame` object of the matches sorted by number of mismatches and score.
-
-### Set Database
-In order to get in the matching results more information about the donors than the matching information,
-one can set a database that has all the donors' information in it.
-The database must be a `pandas.DataFrame` that its indexes are the donors' IDs.
-
-```python
-from GRMA.Match import set_Database
-import pandas as pd
-
-donors = [0, 1, 2]
-database = pd.DataFrame([[30], [32], [25]], columns=["Age"], index=donors)
-
-set_Database(database)
-```
-
-Note: `set_Database()` need to be called only once before 
-performing the matching if additional fields are ment to be added to the results.
-
-### Matching
-
-Get the donors' graph from saved pickle file:
-```python
-from GRMA.Match import Graph
-graph = Graph.from_pickle("path/to/save.pkl") 
-```
-
-The matching result is a dictionary that maps patients IDs to a `pandas.DataFrame` of the matched donors.
-It gets: 
- - A path to the file of the patients' typing.
- - A grim graph object - `grim.Imputation.graph_networkx.Graph`
- - A GRMA donors' graph object - `GRMA.Match.Graph`
+The `GetResultPatients` function applies both Grim and GRMA algorithms. It requires a path to a Grim configuration file with algorithm settings and a path to the data files. The Grim configuration file cannot be ignored, as Grim will use default settings otherwise.
 
 
-```python
-from GRMA.Match import matching
 
-matching_results = matching("path/to/patients/file", grim_graph, donors_graph)
-```
 
-For more options and information about the input of `matching()` see the documentation in the code.
+## Requirements
+
+- Python 3.x
+- Pandas
+- Numpy
+- Cython
+- tqdm
+- setuptools
+- cython
+- networkx
+- toml==0.10.2
+- py-graph-imputation>=0.0.3
+
+
+
