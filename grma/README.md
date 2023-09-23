@@ -11,10 +11,10 @@ To use GRMA, follow these steps:
     ```python
     from grma.matching import BuildDonorsGraph
     
-    donors_dir = 'data/donors_dir'  # Path to your donors data directory
+    donors_file = 'data.txt'  # Path to your donors data
     results_directory = './results_directory'  # Directory to save results
     
-    BuildDonorsGraph(donors_dir, results_directory)
+    BuildDonorsGraph(donors_file, results_directory)
     ```
 
 2. **Impute Patients' Genotypes**: Impute your patient's genotypes using Grim's algorithm. You can use the default settings or customize them by providing a Grim configuration file.

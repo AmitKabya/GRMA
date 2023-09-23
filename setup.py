@@ -3,7 +3,7 @@ from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 
 
-with open("README.md") as readme_file:
+with open("grma/README.md") as readme_file:
     readme = readme_file.read()
 
 with open("requirements.txt") as requirements_file:
@@ -13,6 +13,7 @@ setup(
     name="GRMA",
     version="0.0.1",
     author="Amit Kabya",
+    maintainer="Ziv Naim",
     author_email="kabya.amit@gmail.com",
     python_requires=">=3.8",
     classifiers=[
@@ -30,24 +31,28 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
-    keywords="grma",
-    scripts=["scripts/build-imputation-validation.sh", "scripts/runfile.py"],
+    keywords="graph,em,family",
     packages=find_packages(
         include=[
-            "GRMA",
-            "GRMA.Build",
-            "GRMA.Grim",
-            "GRMA.Match",
-            "GRMA.Utilities"
+            "gram",
+            "grem",
+            "grem.conf",
+            "grem.data",
+            "grem.EM",
+            "grma",
+            "grma.donorsgraph",
+            "grma.imputation",
+            "grma.match",
+            "grma.utilities"
         ]
     ),
     test_suite="tests",
     zip_safe=False,
     ext_modules=cythonize(
         [
-            Extension("GRMA.Utilities.cutils", ["GRMA/Utilities/cutils.pyx"],
+            Extension("grma.utilities.cutils", ["grma/utilities/cutils.pyx"],
                       define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-            Extension("GRMA.Match.lol_graph", ["GRMA/Match/lol_graph.pyx"],
+            Extension("grma.match.lol_graph", ["grma/match/lol_graph.pyx"],
                       define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])
         ]
     ),

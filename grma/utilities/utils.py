@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Iterable
 
-from GRMA.Utilities.cutils import cdrop_less_than_7_matches, ccheck_similarity
+from grma.utilities.cutils import cdrop_less_than_7_matches, ccheck_similarity
 
 from collections.abc import Sequence
 
@@ -149,5 +149,6 @@ def check_similarity(patients_geno, donors_genos, allele_range, init_count_simil
 
 def gl_string_to_integers(genotype: str) -> Sequence[int]:
     genotype = genotype.replace('+', '~').replace('^', '~').replace(":", "")
-    genotype = [int(allele.split("*")[1][:4]) for allele in genotype.split("~")]
+    genotype = [int(allele.split("*")[1][:4]) if len(allele.split("*")) > 1 else 0 for allele in genotype.split("~")]
+
     return genotype
