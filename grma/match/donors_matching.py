@@ -145,7 +145,7 @@ class DonorsMatching(object):
                 # iterate over all the patients with the genotype
                 for patient_id in self._patients_graph.neighbors(geno):
                     # patient's geno index (the number of the geno in the imputation file)
-                    # geno_num = self._patients_graph[geno][patient_id]["geno_num"] # AMIT DELETE
+                    geno_num = self._patients_graph[geno][patient_id]["geno_num"] # AMIT DELETE
                     probability = self._patients_graph[geno][patient_id]["probability"]  # patient's geno probability
 
                     # STUDY TEST CASE
@@ -158,9 +158,9 @@ class DonorsMatching(object):
                     # add the genotype id as a neighbor to the patient
                     # AMIT ADD
                     if geno_candidate_id in self._genotype_candidates[patient_id]:
-                        self._genotype_candidates[patient_id][geno_candidate_id].append((probability, similarity))
+                        self._genotype_candidates[patient_id][geno_candidate_id][geno_num] = (probability, similarity)
                     else:
-                        self._genotype_candidates[patient_id][geno_candidate_id] = [(probability, similarity)]
+                        self._genotype_candidates[patient_id][geno_candidate_id] = {geno_num: (probability, similarity)}
                     # AMIT END
 
                     # AMIT DELETE
@@ -262,7 +262,7 @@ class DonorsMatching(object):
                 prob_dict[geno] += prob
 
             # add genotype->ID edge
-            self._patients_graph.add_edge(geno, patient_id, probability=0)
+            self._patients_graph.add_edge(geno, patient_id, probability=0, geno_num=index)
 
             # add subclasses alleles
             classes, subclasses = self.__classes_and_subclasses_from_genotype(geno)
@@ -330,7 +330,7 @@ class DonorsMatching(object):
 
             # if "geno_num" in self._patients_graph[geno][patient_id]:
             #     print("Patient ID:", patient_id, "has 'geno_num'")
-            # geno_num = self._patients_graph[geno][patient_id]["geno_num"]  # patient's geno index # AMIT DELETE
+            geno_num = self._patients_graph[geno][patient_id]["geno_num"]  # patient's geno index # AMIT DELETE
             probability = self._patients_graph[geno][patient_id]["probability"]  # patient's geno probability
 
             int_geno = tuple_geno_to_int(geno)
@@ -341,7 +341,7 @@ class DonorsMatching(object):
             # This has to be a new edge because this is the first level (searching by genos),
             # and each patient connects only to their own genos, so we wouldn't override the weight dict.
             # self._patients_graph.add_edge(patient_id, geno_id, weight={geno_num: [probability, 10]}) # AMIT DELETE
-            self._genotype_candidates[patient_id][geno_id] = [(probability, 10)] # AMIT ADD
+            self._genotype_candidates[patient_id][geno_id] = {geno_num: (probability, 10)} # AMIT ADD
             # else:
             #     print(f"Missing 'geno_num' for patient_id: {patient_id}")
             #     print("geno:", geno)
@@ -393,8 +393,8 @@ class DonorsMatching(object):
         # a loop that set the scores for all the matching candidates.
         patient_scores = {}
         # for hla_id in self._patients_graph.neighbors(patient): # AMIT DELETE
-        for hla_id in self._genotype_candidates[patient]: # AMIT ADD
-            for prob, matches in self._genotype_candidates[patient][hla_id]: # AMIT CHANGE
+        for hla_id, genotype_matches in self._genotype_candidates[patient].items(): # AMIT ADD
+            for prob, matches in genotype_matches.values(): # AMIT CHANGE
                 # match_info = (probability of patient's genotype, number of matches to patient's genotype)
                 if matches != 10 - mismatch:
                     continue
